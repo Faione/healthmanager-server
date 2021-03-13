@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="stu.swufe.healthmanager.dao.SportsRecordPojoMapper">
+  <resultMap id="BaseResultMap" type="stu.swufe.healthmanager.pojo.SportsRecordPojo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="sports_id" jdbcType="VARCHAR" property="sportsId" />
+    <result column="sportsname" jdbcType="VARCHAR" property="sportsname" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, sports_id, sportsname, user_id, value, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_sports_record
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_sports_record
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="stu.swufe.healthmanager.pojo.SportsRecordPojo">
+    insert into tb_sports_record (id, sports_id, sportsname, 
+      user_id, value, create_time, 
+      update_time)
+    values (#{id,jdbcType=VARCHAR}, #{sportsId,jdbcType=VARCHAR}, #{sportsname,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="stu.swufe.healthmanager.pojo.SportsRecordPojo">
+    insert into tb_sports_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="sportsId != null">
+        sports_id,
+      </if>
+      <if test="sportsname != null">
+        sportsname,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="value != null">
+        value,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="sportsId != null">
+        #{sportsId,jdbcType=VARCHAR},
+      </if>
+      <if test="sportsname != null">
+        #{sportsname,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="stu.swufe.healthmanager.pojo.SportsRecordPojo">
+    update tb_sports_record
+    <set>
+      <if test="sportsId != null">
+        sports_id = #{sportsId,jdbcType=VARCHAR},
+      </if>
+      <if test="sportsname != null">
+        sportsname = #{sportsname,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        value = #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="stu.swufe.healthmanager.pojo.SportsRecordPojo">
+    update tb_sports_record
+    set sports_id = #{sportsId,jdbcType=VARCHAR},
+      sportsname = #{sportsname,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=VARCHAR},
+      value = #{value,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>
