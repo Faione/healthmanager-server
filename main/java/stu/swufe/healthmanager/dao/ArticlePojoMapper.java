@@ -2,6 +2,9 @@ package stu.swufe.healthmanager.dao;
 
 import stu.swufe.healthmanager.pojo.ArticlePojo;
 
+import java.util.List;
+import java.util.Map;
+
 public interface ArticlePojoMapper {
     int deleteByPrimaryKey(String id);
 
@@ -16,4 +19,6 @@ public interface ArticlePojoMapper {
     int updateByPrimaryKeyWithBLOBs(ArticlePojo record);
 
     int updateByPrimaryKey(ArticlePojo record);
+
+    List<ArticlePojo> selectArticlesByPage(Map<String, Object> params);
 }

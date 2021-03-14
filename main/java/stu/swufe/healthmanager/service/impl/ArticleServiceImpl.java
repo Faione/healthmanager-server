@@ -138,6 +138,15 @@ public class ArticleServiceImpl implements IArticelService {
 
     @Override
     public ResponseResult getArticleList(int page, int size, StringBuffer tokenKey) {
+        // 1. 检查用户
+        UserPojo userPojo = iUserService.checkUser(tokenKey);
+        if(userPojo == null){
+            return ResponseResult.creatFailed(ResponseState.NOT_LOGIN_IN);
+        }
+
+        // 分页查询
+
+
         return null;
     }
 
