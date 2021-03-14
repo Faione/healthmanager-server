@@ -18,6 +18,8 @@ mybatis:
   config-location: classpath:mybatis-config.xml
   mapper-locations: classpath*:stu/swufe/healthmanager/mapper/*Mapper.xml
 
-healthmanager.image.save-path: E:\testDataFile\images
-# 最大图片大小2m
-healthmanager.image.max-size: 2097152
+healthmanager:
+  image:
+    save-path: E:\testDataFile\images
+    # 最大图片大小2m
+    max-size: 2097152

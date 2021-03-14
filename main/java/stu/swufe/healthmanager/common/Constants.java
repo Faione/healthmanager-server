@@ -44,4 +44,9 @@ public interface Constants {
 
     }
 
+    interface Page{
+        int PAGE_SIZE = 10;
+        int START_PAGE = 0;
+    }
+
 }

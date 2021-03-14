@@ -36,4 +36,30 @@ public class Swagger2Configration {
                 .version(VERSION)
                 .build();
     }
+
+
+    /**
+     * 管理员中心
+     * @return
+     */
+    @Bean
+    public Docket adminApi(){
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(adminApiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("stu.swufe.healthmanager.controller.admin"))
+                .paths(PathSelectors.any())
+                .build()
+                .groupName("管理员页面");
+    }
+
+    private ApiInfo adminApiInfo(){
+        return new ApiInfoBuilder()
+                .title("健康管理管理员页面接口文档")
+                .description("管理员页面接口文档")
+                .version(VERSION)
+                .build();
+    }
+
+
 }

@@ -3,6 +3,7 @@ package stu.swufe.healthmanager.controller.user;
 
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import stu.swufe.healthmanager.pojo.ArticlePojo;
 import stu.swufe.healthmanager.response.ResponseResult;
@@ -52,11 +53,12 @@ public class ArticleAPI {
         return articelService.retrieveArticle(article_id, tokenKeyBuffer);
     }
 
-    @GetMapping("/list")
-    public ResponseResult getArticleList(@RequestParam("token_key") String tokenKey){
+    @GetMapping("/list/{page}/{size}")
+    public ResponseResult getArticleList(@PathVariable("page") int page,
+                                         @PathVariable("size") int size,
+                                         @RequestParam("token_key") String tokenKey){
         StringBuffer tokenKeyBuffer = new StringBuffer(tokenKey);
-//        return articelService.getArticleList(tokenKeyBuffer);
-        return null;
+        return articelService.getArticleList(page, size, tokenKeyBuffer);
     }
 
 

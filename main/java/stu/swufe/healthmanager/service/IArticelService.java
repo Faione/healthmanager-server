@@ -39,10 +39,14 @@ public interface IArticelService {
      */
     ResponseResult retrieveArticle(String article_id, StringBuffer tokenKey);
 
+
     /**
      * 查询多篇文章
+     *
+     * @param page
+     * @param size
      * @param tokenKey
      * @return
      */
-//    ResponseResult getArticleList(StringBuffer tokenKey);
+    ResponseResult getArticleList(int page, int size, StringBuffer tokenKey);
 }

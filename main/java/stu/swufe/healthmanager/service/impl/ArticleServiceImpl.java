@@ -14,7 +14,6 @@ import stu.swufe.healthmanager.response.ResponseState;
 import stu.swufe.healthmanager.service.IArticelService;
 import stu.swufe.healthmanager.service.IUserService;
 import stu.swufe.healthmanager.util.IDWorker;
-import stu.swufe.healthmanager.util.TestUtil;
 import stu.swufe.healthmanager.util.TextUtils;
 
 import java.util.Date;
@@ -135,6 +134,11 @@ public class ArticleServiceImpl implements IArticelService {
         ArticlePojo articlePojo = articlePojoMapper.selectByPrimaryKey(article_id);
 
         return ResponseResult.createSuccess(ResponseState.SUCCESS, articlePojo).setToken(String.valueOf(tokenKey));
+    }
+
+    @Override
+    public ResponseResult getArticleList(int page, int size, StringBuffer tokenKey) {
+        return null;
     }
 
 
