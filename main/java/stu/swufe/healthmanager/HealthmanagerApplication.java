@@ -18,6 +18,7 @@ import stu.swufe.healthmanager.util.TokenStorage;
 public class HealthmanagerApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(HealthmanagerApplication.class, args);
     }
     @Bean

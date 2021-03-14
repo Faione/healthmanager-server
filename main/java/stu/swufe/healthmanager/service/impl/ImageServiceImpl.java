@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import stu.swufe.healthmanager.pojo.ImagePojo;
+import stu.swufe.healthmanager.common.ImagType;;
 import stu.swufe.healthmanager.response.ResponseResult;
 import stu.swufe.healthmanager.response.ResponseState;
 import stu.swufe.healthmanager.service.IImageService;
@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 @Log4j
 @Service
@@ -28,6 +27,8 @@ public class ImageServiceImpl implements IImageService {
 
     public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy_MM_dd");
 
+    private static final String[] typeList = {"png", "jpg", "gif"};
+
     @Autowired
     IDWorker idWorker;
 
@@ -35,14 +36,17 @@ public class ImageServiceImpl implements IImageService {
 
     @Override
     public ResponseResult uploadImage(MultipartFile file, String userId) {
+
         // 判断是否有文件
         if(file == null){
             return  ResponseResult.creatFailed("图片不能为空");
         }
 
+        // 用户验证（防止接口泄露）
+
         // 判断文件类型（请求头中）
         String contentType = file.getContentType();
-        String type = getType(contentType);
+        ImagType type = ImagType.fromContentTypeToImageType(contentType);
 
         if(type == null){
             return ResponseResult.creatFailed("不支持的图片类型");
@@ -66,7 +70,7 @@ public class ImageServiceImpl implements IImageService {
         // 根据规则进行命名
         long nowTime = new Date().getTime();
         String randId = String.valueOf(idWorker.nextId());
-        String targetPath = getTargetPath(nowTime, type, randId);
+        String targetPath = getTargetPath(nowTime, type.getType(), randId);
         log.info("targetPath: " + targetPath);
 
         // 创建文件/路径
@@ -93,7 +97,7 @@ public class ImageServiceImpl implements IImageService {
 
 
         // 记录数据库
-        String id = createId(nowTime, type, randId);
+        String id = createId(nowTime, type.ordinal(), randId);
 
         log.info("ImageId: " + id);
 
@@ -141,20 +145,25 @@ public class ImageServiceImpl implements IImageService {
         if(in != null) in.close();
         if(out != null) out.close();
 
-        // 不再调用 response，而返回空  情窦初开的时候我在这儿想着你
+        // 不再调用 response，而返回空
+        // ???? 情窦初开的时候我在这儿想着你
         return null;
     }
 
-    private String idToPath(String imageId) {
-        String type = imageId.substring(0, 3);
-        long nowTime = Long.valueOf(imageId.substring(3, 16));
-        String randID = imageId.substring(16);
+    public  String idToPath(String imageId) {
 
-        return getTargetPath(nowTime, type, randID);
+        int typeCode = imageId.charAt(0) - '0';
+        long nowTime = Long.valueOf(imageId.substring(1, 14));
+        String randID = imageId.substring(14);
+        System.out.println("typeCode: " + typeCode);
+        ImagType type = ImagType.fromIndexToImageType(typeCode);
+
+        return getTargetPath(nowTime, type.getType(), randID);
     }
 
-    private String createId(long nowTime, String type, String randId) {
-        return  type + nowTime + randId;
+    private String createId(long nowTime, int typeCode, String randId) {
+
+        return   String.valueOf(typeCode) + String.valueOf(nowTime) + randId;
 
     }
 
@@ -176,20 +185,5 @@ public class ImageServiceImpl implements IImageService {
 
     }
 
-    private String getType(String contentType){
-        String type;
-
-        switch (contentType){
-            case "image/jpg":
-            case "image/png":
-            case "image/gif":
-                type = contentType.substring(contentType.indexOf("/") + 1);
-                break;
-            default:
-                type = null;
-        }
-
-        return type;
-    }
 
 }
