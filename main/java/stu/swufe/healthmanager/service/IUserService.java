@@ -40,12 +40,12 @@ public interface IUserService {
 
     /**
      * 用户登录
-     * @param captchacode
-     * @param captchakey
+     * @param captchaCode
+     * @param captchaKey
      * @param userPojo
      * @return
      */
-    ResponseResult dologin(String captchacode, String captchakey, UserPojo userPojo);
+    ResponseResult dologin(String captchaCode, String captchaKey, UserPojo userPojo);
 
     /**
      * 检验Token，并返回用户对象

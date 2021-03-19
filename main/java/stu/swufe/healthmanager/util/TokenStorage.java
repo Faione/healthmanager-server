@@ -87,8 +87,9 @@ public class  TokenStorage implements ITokenStorage {
                     return claims;
                 }
                 log.info(classname + ": mysql数据库中数据为脏，请求原数据");
-                // 数据为脏
-                userPojoMapper.deleteByPrimaryKey(refreshTokenPojo.getId());
+                // 数据为脏, 重设refreshToken, tokenKey
+
+//                refreshTokenPojoMapper.updateByPrimaryKey(refreshTokenPojo.getId());
 
                 UserPojo userFromDb = userPojoMapper.selectByPrimaryKey(refreshTokenPojo.getUserId());
 
@@ -96,7 +97,7 @@ public class  TokenStorage implements ITokenStorage {
 
                 // 重置Mysql、Redis
                 log.info(classname + ": 重置Redis、Mysql中的用户token");
-                reFresh(newClaims);
+                reFresh(newClaims, refreshTokenPojo);
 
                 return newClaims;
 
@@ -111,7 +112,23 @@ public class  TokenStorage implements ITokenStorage {
         return null;
     }
 
-    public void reFresh(Map<String, Object> newClaims){
+
+    public void reFresh(Map<String, Object> newClaims, RefreshTokenPojo oldRefreshTokenPojo){
+        String tokenStr = JwtUtil.createToken(newClaims);
+        String refreshToken = JwtUtil.createToken(newClaims, Constants.StaticValue.MYSQL_TOKEN_TIME);
+
+        // Token的MD5值作为TokenKey
+        this.setNewTokenkey(DigestUtils.md5DigestAsHex(tokenStr.getBytes(StandardCharsets.UTF_8)));
+
+        // 重置Redis
+        writeRedis(this.newTokenkey, refreshToken);
+
+        // 刷新Mysql
+        reFreshMysql(oldRefreshTokenPojo, this.newTokenkey, tokenStr);
+
+    }
+
+    public void writeToken(Map<String, Object> newClaims){
         String userId = (String) newClaims.get(this.userIDKey);
 
         String tokenStr = JwtUtil.createToken(newClaims);
@@ -120,11 +137,11 @@ public class  TokenStorage implements ITokenStorage {
         // Token的MD5值作为TokenKey
         this.setNewTokenkey(DigestUtils.md5DigestAsHex(tokenStr.getBytes(StandardCharsets.UTF_8)));
 
-
         // 重置Redis
         writeRedis(this.newTokenkey, refreshToken);
 
         // 重置Mysql
+        // 删除以往记录
         refreshTokenPojoMapper.deleteByUserId(userId);
         writeMysql(this.newTokenkey, userId, tokenStr);
     }
@@ -139,15 +156,32 @@ public class  TokenStorage implements ITokenStorage {
     public void writeMysql(String ad, String userId, String tokenStr) {
         RefreshTokenPojo refreshTokenPojo = new RefreshTokenPojo();
         refreshTokenPojo.setId(String.valueOf(this.idWorker.nextId()));
+
         refreshTokenPojo.setDirt(false);
+
         refreshTokenPojo.setTokenKey(Constants.StaticValue.SALT_TOKEN + ad);
         refreshTokenPojo.setRefreshToken(tokenStr);
+
         refreshTokenPojo.setUserId(userId);
         refreshTokenPojo.setCreateDate(new Date());
         refreshTokenPojo.setUpdateDate(new Date());
         refreshTokenPojoMapper.insert(refreshTokenPojo);
 
     }
+
+
+    public void reFreshMysql(RefreshTokenPojo oldRefreshTokenPojo, String ad, String tokenStr) {
+        // 重设tokenKey, 重设tokenStr
+        oldRefreshTokenPojo.setTokenKey(Constants.StaticValue.SALT_TOKEN + ad);
+        oldRefreshTokenPojo.setRefreshToken(tokenStr);
+
+        oldRefreshTokenPojo.setDirt(false);
+        oldRefreshTokenPojo.setUpdateDate(new Date());
+
+        refreshTokenPojoMapper.updateByPrimaryKeySelective(oldRefreshTokenPojo);
+
+    }
+
 
     public String getNewTokenkey() {
         return newTokenkey;

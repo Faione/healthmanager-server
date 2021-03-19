@@ -31,6 +31,16 @@
     from tb_ucc
     where id = #{id,jdbcType=VARCHAR}
   </select>
+
+  <!--搜索指定数量的数据，并按日期排序-->
+  <select id="selectArticlesByPage"  parameterType="java.util.Map" resultMap="ResultMapWithBLOBs">
+    select *
+    from tb_ucc
+    order by create_time desc
+    limit #{start}, #{size}
+  </select>
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tb_ucc
     where id = #{id,jdbcType=VARCHAR}

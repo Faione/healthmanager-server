@@ -46,6 +46,8 @@ public class ImageServiceImpl implements IImageService {
 
         // 判断文件类型（请求头中）
         String contentType = file.getContentType();
+
+        log.info("ImageType: " + contentType);
         ImagType type = ImagType.fromContentTypeToImageType(contentType);
 
         if(type == null){

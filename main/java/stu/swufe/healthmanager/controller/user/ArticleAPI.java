@@ -45,20 +45,16 @@ public class ArticleAPI {
 
     }
 
+    // 查看不需要用户登录
     @GetMapping("/{article_id}")
-    public ResponseResult retrieveArticle(@PathVariable String article_id,
-                                          @RequestParam("token_key") String tokenKey){
-
-        StringBuffer tokenKeyBuffer = new StringBuffer(tokenKey);
-        return articelService.retrieveArticle(article_id, tokenKeyBuffer);
+    public ResponseResult retrieveArticle(@PathVariable String article_id){
+        return articelService.retrieveArticle(article_id);
     }
 
     @GetMapping("/list/{page}/{size}")
     public ResponseResult getArticleList(@PathVariable("page") int page,
-                                         @PathVariable("size") int size,
-                                         @RequestParam("token_key") String tokenKey){
-        StringBuffer tokenKeyBuffer = new StringBuffer(tokenKey);
-        return articelService.getArticleList(page, size, tokenKeyBuffer);
+                                         @PathVariable("size") int size){
+        return articelService.getArticleList(page, size);
     }
 
 

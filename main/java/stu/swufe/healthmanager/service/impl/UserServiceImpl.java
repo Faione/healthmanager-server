@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -131,6 +132,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         // 3. 密码加密
+
         userPojo.setPassword(bCryptPasswordEncoder.encode(userPojo.getPassword()));
 
         // 4. 补全数据
@@ -143,14 +145,17 @@ public class UserServiceImpl implements IUserService {
         setDefaultInfo(userPojo, request);
 
         // 5. 存入数据库
-        logUserPojo(userPojo);
-
-
         userPojoMapper.insert(userPojo);
 
-        // 6. 去除密码值的返回
-        userPojo.setPassword(null);
-        return ResponseResult.createSuccess(ResponseState.REGISTER_SUCCESS, userPojo);
+        // 6. 生成Token并返回
+        Map<String, Object> claims = ClaimsUtil.toClaims(userPojo);
+        tokenStorage.setTools(userPojoMapper, refreshTokenPojoMapper, idWorker, redisUtil);
+
+        tokenStorage.writeToken(claims);
+
+        // 携带用户信息并返回
+
+        return ResponseResult.createSuccess(ResponseState.REGISTER_SUCCESS, claims).setToken(tokenStorage.getNewTokenkey());
     }
 
     @Override
@@ -181,21 +186,23 @@ public class UserServiceImpl implements IUserService {
         Map<String, Object> claims = ClaimsUtil.toClaims(userFromDb);
         tokenStorage.setTools(userPojoMapper, refreshTokenPojoMapper, idWorker, redisUtil);
 
-        tokenStorage.reFresh(claims);
+        tokenStorage.writeToken(claims);
 
-        return ResponseResult.createSuccess(ResponseState.LOGIN_SUCCESS).setToken(tokenStorage.getNewTokenkey());
+        // 携带用户信息并返回
+
+        return ResponseResult.createSuccess(ResponseState.LOGIN_SUCCESS, claims).setToken(tokenStorage.getNewTokenkey());
     }
 
     @Override
-    public UserPojo checkUser(StringBuffer tokenkeyBuffer) {
+    public UserPojo checkUser(StringBuffer tokenKeyBuffer) {
         tokenStorage.setTools(userPojoMapper, refreshTokenPojoMapper, idWorker, redisUtil);
-        Map<String, Object> claims = tokenStorage.readRedis(String.valueOf(tokenkeyBuffer));
+        Map<String, Object> claims = tokenStorage.readRedis(String.valueOf(tokenKeyBuffer));
 
 
         if(claims!=null){
             if(tokenStorage.getNewTokenkey()!=null){
-                tokenkeyBuffer.delete(0, tokenkeyBuffer.length());
-                tokenkeyBuffer.append(tokenStorage.getNewTokenkey());
+                tokenKeyBuffer.delete(0, tokenKeyBuffer.length());
+                tokenKeyBuffer.append(tokenStorage.getNewTokenkey());
             }
             return ClaimsUtil.toPojo(claims, UserPojo.class);
         }
@@ -337,7 +344,8 @@ public class UserServiceImpl implements IUserService {
             return ResponseResult.creatFailed("验证码过期");
         }
 
-        if(!captchaverifycode.equals(captchacode)){
+        // 检测验证码是否正确，忽略大小写
+        if(!captchaverifycode.toLowerCase(Locale.ROOT).equals(captchacode.toLowerCase())){
             return ResponseResult.creatFailed("验证码错误");
         }else{
             redisUtil.del(Constants.StaticValue.SALT_CAPTCHA + captchakey);

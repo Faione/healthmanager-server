@@ -1,0 +1,25 @@
+# 应用服务 WEB 访问端口
+server:
+  port: 9001
+
+spring:
+  application:
+    name: blog-system
+  datasource:
+    url: jdbc:mysql://localhost:3306/health_manager?serverTimezone=GMT&characterEncoding=utf-8&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: test_user
+    password: 123456
+  redis:
+    port: 6379
+    host: 47.119.132.173
+    password: 123456
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath*:stu/swufe/healthmanager/mapper/*Mapper.xml
+
+healthmanager:
+  image:
+    save-path: /home/app/test/datafile/images
+    # 最大图片大小2m
+    max-size: 2097152

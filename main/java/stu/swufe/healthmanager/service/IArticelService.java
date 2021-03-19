@@ -34,10 +34,9 @@ public interface IArticelService {
     /**
      * 查询一篇文章
      * @param article_id
-     * @param tokenKey
      * @return
      */
-    ResponseResult retrieveArticle(String article_id, StringBuffer tokenKey);
+    ResponseResult retrieveArticle(String article_id);
 
 
     /**
@@ -45,8 +44,7 @@ public interface IArticelService {
      *
      * @param page
      * @param size
-     * @param tokenKey
      * @return
      */
-    ResponseResult getArticleList(int page, int size, StringBuffer tokenKey);
+    ResponseResult getArticleList(int page, int size);
 }

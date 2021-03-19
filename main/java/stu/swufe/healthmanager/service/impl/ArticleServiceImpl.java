@@ -14,9 +14,12 @@ import stu.swufe.healthmanager.response.ResponseState;
 import stu.swufe.healthmanager.service.IArticelService;
 import stu.swufe.healthmanager.service.IUserService;
 import stu.swufe.healthmanager.util.IDWorker;
+import stu.swufe.healthmanager.util.PageUtil;
 import stu.swufe.healthmanager.util.TextUtils;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Log4j
@@ -120,34 +123,33 @@ public class ArticleServiceImpl implements IArticelService {
     }
 
     @Override
-    public ResponseResult retrieveArticle(String article_id, StringBuffer tokenKey) {
-        // 1. 检查用户
-        UserPojo userPojo = iUserService.checkUser(tokenKey);
-        if(userPojo == null){
-            return ResponseResult.creatFailed(ResponseState.NOT_LOGIN_IN);
-        }
+    public ResponseResult retrieveArticle(String article_id) {
 
-        // 2. 根据id查询
+        // 根据id查询
 
         if(TextUtils.isEmpty(article_id)) return ResponseResult.creatFailed();
 
         ArticlePojo articlePojo = articlePojoMapper.selectByPrimaryKey(article_id);
 
-        return ResponseResult.createSuccess(ResponseState.SUCCESS, articlePojo).setToken(String.valueOf(tokenKey));
+        // 设置点击量统计
+
+        return ResponseResult.createSuccess(ResponseState.SUCCESS, articlePojo);
     }
 
     @Override
-    public ResponseResult getArticleList(int page, int size, StringBuffer tokenKey) {
-        // 1. 检查用户
-        UserPojo userPojo = iUserService.checkUser(tokenKey);
-        if(userPojo == null){
-            return ResponseResult.creatFailed(ResponseState.NOT_LOGIN_IN);
-        }
+    public ResponseResult getArticleList(int page, int size) {
 
         // 分页查询
+        page = Math.max(page, Constants.Page.START_PAGE);
+
+        size = Math.max(size, Constants.Page.PAGE_SIZE);
+
+        Map<String, Object> params = PageUtil.getQueryMap(page, size);
+
+        List<ArticlePojo> list =  articlePojoMapper.selectArticlesByPage(params);
 
 
-        return null;
+        return ResponseResult.createSuccess(ResponseState.SUCCESS, list);
     }
 
 
