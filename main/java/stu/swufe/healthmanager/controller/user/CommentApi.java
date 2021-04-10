@@ -23,9 +23,12 @@ public class CommentApi {
         return commentService.uploadComment(commentPojoWithBLOBs, tokenKeyBuffer);
     }
 
-    @GetMapping("/list")
-    public ResponseResult getCommentList(@RequestParam("article_id")String articleId){
-        return null;
+    @GetMapping("/list/{page}/{size}")
+    public ResponseResult getCommentList(@RequestParam("article_id")String articleId,
+                                         @PathVariable("page")int page,
+                                         @PathVariable("size")int size){
+
+        return commentService.listComment(articleId, page, size);
     }
 
 }

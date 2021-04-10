@@ -11,4 +11,13 @@ public interface ICommentService {
      * @return
      */
     ResponseResult uploadComment(CommentPojoWithBLOBs commentPojoWithBLOBs, StringBuffer tokenKeyBuffer);
+
+    /**
+     * 查询回复列表
+     * @param articleId
+     * @param page
+     * @param size
+     * @return
+     */
+    ResponseResult listComment(String articleId, int page, int size);
 }

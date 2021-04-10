@@ -345,7 +345,8 @@ public class UserServiceImpl implements IUserService {
         }
 
         // 检测验证码是否正确，忽略大小写
-        if(!captchaverifycode.toLowerCase(Locale.ROOT).equals(captchacode.toLowerCase())){
+//      captchaverifycode.toLowerCase(Locale.ROOT).equals(captchacode.toLowerCase())
+        if(!captchaverifycode.equalsIgnoreCase(captchacode)){
             return ResponseResult.creatFailed("验证码错误");
         }else{
             redisUtil.del(Constants.StaticValue.SALT_CAPTCHA + captchakey);

@@ -29,6 +29,17 @@
     from tb_comment
     where id = #{id,jdbcType=VARCHAR}
   </select>
+
+<!--分页查询指定文章的评论-->
+  <select id="selectCommentsByAriticle"  parameterType="java.util.Map" resultMap="ResultMapWithBLOBs">
+    select *
+    from tb_comment
+    where ucc_id = #{uccId,jdbcType=VARCHAR}
+    order by create_time desc
+      limit #{start}, #{size}
+  </select>
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tb_comment
     where id = #{id,jdbcType=VARCHAR}
